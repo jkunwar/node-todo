@@ -9,11 +9,12 @@ export const getTodos = async () => {
         if (todos.status === 200) {
             return todos.data.data
         } else {
-            throw new Error('error occured')
+            console.log('some error occured')
+            // throw new Error('error occured')
         }
     } catch (error) {
-        // throw new Error('network error')
-        return []
+        console.log(error.message)
+        return
     }
 }
 
@@ -28,10 +29,12 @@ export const addTodo = async (task) => {
         if (todo.status === 201) {
             return todo.data.data
         } else {
-            throw new Error('error occured')
+            console.log('some error occured')
+            // throw new Error('error occured')
         }
     } catch (error) {
-        throw new Error('network error')
+        console.log(error)
+        return
     }
 }
 
@@ -46,10 +49,11 @@ export const updateTodo = async (todoId, task, is_completed = false) => {
         if (todo.status === 200) {
             return todo.data.data
         } else {
-            throw new Error('error occured')
+            console.log('some error occured')
+            // throw new Error('error occured')
         }
     } catch (error) {
-        throw new Error('network error')
+        console.log(error)
         return
     }
 }
@@ -64,8 +68,8 @@ export const deleteTodo = async (todoId) => {
         if (todo.status === 204) {
             return true
         } else {
+            console.log('some error occured')
             return false
-            // throw new Error('error occured')
         }
     } catch (error) {
         return false

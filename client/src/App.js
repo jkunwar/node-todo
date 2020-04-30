@@ -20,6 +20,7 @@ class App extends PureComponent {
 
     async componentDidMount() {
         const todos = await getTodos()
+        if (!todos) return
         this.setState({ todos })
     }
 
@@ -32,9 +33,11 @@ class App extends PureComponent {
         }
         if (action === 'add') {
             const newTodo = await addTodo(todo)
+            if (!newTodo) return
             todos.unshift(newTodo)
         } else if (action === 'update' && selectedTodoID !== null) {
             const updatedTodo = await updateTodo(selectedTodoID, todo)
+            if (!updatedTodo) return
             const index = todos.findIndex(todo => todo.id === updatedTodo.id)
             if (index === -1) return
             todos[index] = updatedTodo
@@ -52,6 +55,7 @@ class App extends PureComponent {
         const { task, is_completed, id } = todos[index]
         const completed = is_completed ? false : true
         const updatedTodo = await updateTodo(id, task, completed)
+        if (!updatedTodo) return
         todos[index] = updatedTodo
         this.setState({ todos: todos })
     }
