@@ -8,6 +8,7 @@ const status = {
     created: 201,
     bad: 400,
     nocontent: 204,
+    unprocessable: 422,
 };
 
 module.exports = {

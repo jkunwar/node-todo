@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import './App.css';
 import { getTodos, addTodo, updateTodo, deleteTodo } from './services/todoServices'
 import Navbar from './components/Navbar'
+import TodoList from './components/TodoList';
 
 class App extends PureComponent {
 
@@ -19,9 +20,9 @@ class App extends PureComponent {
     }
 
     async componentDidMount() {
-        const todos = await getTodos()
-        if (!todos) return
-        this.setState({ todos })
+        const { payload, status } = await getTodos()
+        if (status !== 200) return
+        this.setState({ todos: payload })
     }
 
     handleSubmit = async (e) => {
@@ -32,17 +33,17 @@ class App extends PureComponent {
             return
         }
         if (action === 'add') {
-            const newTodo = await addTodo(todo)
-            if (!newTodo) return
-            todos.unshift(newTodo)
+            const { payload, status } = await addTodo(todo)
+            if (status !== 201) return
+            todos.unshift(payload)
         } else if (action === 'update' && selectedTodoID !== null) {
-            const updatedTodo = await updateTodo(selectedTodoID, todo)
-            if (!updatedTodo) return
-            const index = todos.findIndex(todo => todo.id === updatedTodo.id)
+            const { payload, status } = await updateTodo(selectedTodoID, todo)
+            if (status !== 200) return
+            const index = todos.findIndex(todo => todo.id === payload.id)
             if (index === -1) return
-            todos[index] = updatedTodo
+            todos[index] = payload
         }
-        this.setState({ todos, todo: '', error: '', selectedTodoID: null })
+        this.setState({ todos, todo: '', action: 'add', error: '', selectedTodoID: null })
     }
 
     handleEdit = index => () => {
@@ -54,9 +55,9 @@ class App extends PureComponent {
         let todos = [...this.state.todos]
         const { task, is_completed, id } = todos[index]
         const completed = is_completed ? false : true
-        const updatedTodo = await updateTodo(id, task, completed)
-        if (!updatedTodo) return
-        todos[index] = updatedTodo
+        const { payload, status } = await updateTodo(id, task, completed)
+        if (status !== 200) return
+        todos[index] = payload
         this.setState({ todos: todos })
     }
 
@@ -66,37 +67,20 @@ class App extends PureComponent {
 
         let todos = [...this.state.todos]
         const { id } = todos[index]
-        const deleted = await deleteTodo(id)
-        if (!deleted) return
+        const { status } = await deleteTodo(id)
+        if (status !== 204) return
         todos.splice(index, 1)
         this.setState({ todos: todos })
     }
 
-    renderTodos = () => {
-        const todos = this.state.todos.map((todo, index) => (
-            <li className="list-group-item d-flex justify-content-between align-items-center" key={todo.id}>
-                <div className="d-flex align-items-center">
-                    <input type='checkbox' name='is_completed' checked={todo.is_completed} onChange={this.toggleCompleted(index)} />
-                    <span className={`ml-2 ${todo.is_completed && 'line-through'} `}>{todo.task}</span>
-                </div>
-                <div className="ml-2">
-                    <a href="#" onClick={this.handleEdit(index)} className="mr-2">Edit</a>
-                    <a href="#" onClick={this.deleteTodo(index)}>Delete</a>
-                </div>
-            </li>
-        ))
-        return todos
-    }
-
     render() {
-        const { todo, error, action } = this.state
+        const { todo, error, action, todos } = this.state
         return (
             <React.Fragment>
                 <Navbar />
                 <div className="container mt-3">
                     <div className="row">
-                        <div className="col-md-3"></div>
-                        <div className="col-md-9 mb-3">
+                        <div className="col-md-8  offset-md-2 mb-3">
                             <form>
                                 <div className="d-flex">
                                     <input
@@ -115,11 +99,13 @@ class App extends PureComponent {
                         </div>
                     </div>
                     <div className="row">
-                        <div className="col-md-3"></div>
-                        <div className="col-md-9">
-                            <ul className="list-group list-group-flush">
-                                {this.renderTodos()}
-                            </ul>
+                        <div className="col-md-8  offset-md-2 mb-3">
+                            <TodoList
+                                todos={todos}
+                                toggleCompleted={this.toggleCompleted}
+                                handleEdit={this.handleEdit}
+                                deleteTodo={this.deleteTodo}
+                            />
                         </div>
                     </div>
                 </div>
@@ -127,6 +113,5 @@ class App extends PureComponent {
         );
     }
 }
-
 
 export default App;

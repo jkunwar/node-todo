@@ -26,7 +26,7 @@ const addTodo = async (req, res) => {
 
     if (task === undefined || task === '') {
         errorMessage.error = 'Task field required';
-        return res.status(status.bad).send(errorMessage);
+        return res.status(status.unprocessable).send(errorMessage);
     }
 
     const createTodoQuery = `INSERT INTO
@@ -98,7 +98,6 @@ const deleteTodo = async (req, res) => {
             errorMessage.error = 'Todo can not be found';
             return res.status(status.notfound).send(errorMessage);
         }
-        console.log(dbResponse)
         successMessage.data = {};
         successMessage.data.message = 'Todo deleted successfully';
         return res.status(status.nocontent).send(successMessage);
@@ -108,7 +107,6 @@ const deleteTodo = async (req, res) => {
         return res.status(status.error).send(errorMessage);
     }
 }
-
 
 module.exports = {
     getTodos,
