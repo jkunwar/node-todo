@@ -1,18 +1,18 @@
 const dbQuery = require('../db/dbQuery')
 const moment = require('moment')
 const { errorMessage, successMessage, status, } = require('../helpers/status')
+const Todo = require('../models/Todo')
+
+const todo = new Todo()
 
 const getTodos = async (req, res) => {
-
-    const getAllTodos = 'SELECT * FROM todos ORDER BY id DESC';
     try {
-        const { rows } = await dbQuery.query(getAllTodos);
-        const dbResponse = rows;
-        if (dbResponse[0] === undefined) {
-            errorMessage.error = 'There are no todos';
+        const { rows } = await todo.findAll()
+        if (rows[0] === undefined) {
+            errorMessage.error = 'No todos found';
             return res.status(status.notfound).send(errorMessage);
         }
-        successMessage.data = dbResponse;
+        successMessage.data = rows;
         return res.status(status.success).send(successMessage);
     } catch (error) {
         errorMessage.error = 'An error Occured';
@@ -29,21 +29,14 @@ const addTodo = async (req, res) => {
         return res.status(status.unprocessable).send(errorMessage);
     }
 
-    const createTodoQuery = `INSERT INTO
-          todos(task, is_completed, created_on, updated_on)
-          VALUES($1, $2, $3, $4)
-          returning *`;
-    const values = [
-        task,
-        false,
-        created_on,
-        created_on
-    ];
-
     try {
-        const { rows } = await dbQuery.query(createTodoQuery, values);
-        const dbResponse = rows[0];
-        successMessage.data = dbResponse;
+        const { rows } = await todo.save({
+            task: task,
+            is_completed: false,
+            created_on: created_on,
+            updated_on: created_on
+        });
+        successMessage.data = rows[0];
         return res.status(status.created).send(successMessage);
     } catch (error) {
         errorMessage.error = 'Unable to add todo';
@@ -61,23 +54,18 @@ const updateTodo = async (req, res) => {
         return res.status(status.bad).send(errorMessage);
     }
 
-    const findTodoById = 'SELECT * FROM todos WHERE id=$1';
-
-    const createBusQuery = `UPDATE todos set task=$2,is_completed=$3, updated_on=$4 where id=$1 returning *`;
     const completed = is_completed ? is_completed : false
-    const values = [id, task, completed, updated_on];
 
     try {
-        const { rows } = await dbQuery.query(findTodoById, [id]);
-        const dbResponse = rows[0];
-        if (!dbResponse) {
-            errorMessage.error = 'Todo can not be found';
+        const { rows } = await todo.findById(id);
+        if (!rows[0]) {
+            errorMessage.error = 'Todo not found';
             return res.status(status.notfound).send(errorMessage);
         }
 
-        const response = await dbQuery.query(createBusQuery, values);
-        const dbResults = response.rows[0];
-        successMessage.data = dbResults;
+        const response = await todo.update(id, { task, is_completed: completed, updated_on });
+        const results = response.rows[0];
+        successMessage.data = results;
         return res.status(status.success).send(successMessage);
     } catch (error) {
         console.log(error)
@@ -88,14 +76,10 @@ const updateTodo = async (req, res) => {
 
 const deleteTodo = async (req, res) => {
     const { id } = req.params
-
-    const deleteTodo = `DELETE FROM todos where id=$1 returning *`;
-
     try {
-        const { rows } = await dbQuery.query(deleteTodo, [id]);
-        const dbResponse = rows[0];
-        if (!dbResponse) {
-            errorMessage.error = 'Todo can not be found';
+        const { rows } = await todo.delete({ id });
+        if (!rows[0]) {
+            errorMessage.error = 'Todo not found';
             return res.status(status.notfound).send(errorMessage);
         }
         successMessage.data = {};
