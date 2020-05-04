@@ -6,17 +6,17 @@ class Model {
         TABLE_NAME = TABLE_NAME
     }
 
-    findAll() {
-        const queryString = `SELECT * from ${this.TABLE_NAME} ORDER BY id DESC`;
+    findAll(columns = ['*']) {
+        const queryString = `SELECT ${columns} from ${this.TABLE_NAME} ORDER BY id DESC`;
         return dbQuery.query(queryString)
     }
 
-    findById(id) {
-        const queryString = `SELECT * from ${this.TABLE_NAME} WHERE id=$1`;
+    findById(id, columns = ['*']) {
+        const queryString = `SELECT ${columns} from ${this.TABLE_NAME} WHERE id=$1`;
         return dbQuery.query(queryString, [id])
     }
 
-    save(obj) {
+    save(obj = {}) {
         if (typeof (obj) !== 'object') new Error('invalid data')
         const keys = Object.keys(obj)
         const values = Object.values(obj)
@@ -25,12 +25,11 @@ class Model {
         return dbQuery.query(queryString, values)
     }
 
-    update(id, obj) {
+    update(id, obj = {}) {
         if (typeof (obj) !== 'object') new Error('invalid data')
         const keys = Object.keys(obj)
         const set = keys.map((k, i) => `${k}=$${i + 1}`)
-        let values = Object.values(obj)
-        values = [...values, id]
+        const values = [...Object.values(obj), id]
         const queryString = `UPDATE todos set ${set} where id=$${values.length} returning *`
         return dbQuery.query(queryString, values)
     }

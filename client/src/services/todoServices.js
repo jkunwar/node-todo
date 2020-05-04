@@ -54,8 +54,8 @@ function call(method, url, params, ignoreCodes) {
     return axios(fullUrl, axiosParams)
         .then(generateHelper(ignoreCodes))
         .catch(error => {
-            let status = error.response.status
-            let errorMsg = error.response.data.error
+            let status = error.response ? error.response.statuss : undefined
+            let errorMsg = error.response ? error.response.data.error : 'Check your internet connection'
             const value = { payload: null, status: status };
             switch (status) {
                 case 422:
@@ -75,7 +75,7 @@ function call(method, url, params, ignoreCodes) {
                     Object.assign(value, { error: { message: errorMsg } });
                     break;
                 default:
-                    Object.assign(value, { error: { message: 'Check your internet connection.' } });
+                    Object.assign(value, { error: { message: errorMsg } });
                     break;
             }
             return value
