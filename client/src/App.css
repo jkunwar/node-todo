@@ -1,15 +1,16 @@
-.form-control, .btn {
-    box-shadow: none !important;
+body {
+  background-color: #f3f3f3 !important;
 }
 
-.invalid-feedback {
-    display: block;
-    width: 100%;
-    margin-top: .25rem;
-    font-size: 80%;
-    color: #dc3545;
+.todos-container {
+  margin-top: 10px !important;
 }
 
-.line-through {
-    text-decoration: line-through;
+.remove-todo-button {
+  font-size: 22px;
+  color: whitesmoke;
+  border: 1px solid transparent;
+  padding: 5px;
+  border-radius: 5px;
+  background: orangered;
 }

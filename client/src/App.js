@@ -1,15 +1,15 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 import './App.css';
+import { Row, Col, Card, message } from 'antd';
 import { getTodos, addTodo, updateTodo, deleteTodo } from './services/todoServices'
-import Navbar from './components/Navbar'
 import TodoList from './components/TodoList';
+import TodoForm from './components/TodoForm';
 
-class App extends PureComponent {
+class App extends React.Component {
 
     state = {
         todos: [],
         todo: '',
-        error: '',
         selectedTodoID: null,
         action: 'add'
     }
@@ -25,92 +25,86 @@ class App extends PureComponent {
         this.setState({ todos: payload })
     }
 
-    handleSubmit = async (e) => {
-        e.preventDefault()
-        let { todo, todos, action, selectedTodoID } = this.state
-        if (todo === undefined || todo === '') {
+    handleSubmit = async (value) => {
+        let { action, selectedTodoID } = this.state
+        let todos = [...this.state.todos]
+        if (value.todo === undefined || value.todo === '') {
             this.setState({ error: 'Task field is required' })
             return
         }
         if (action === 'add') {
-            const { payload, status } = await addTodo(todo)
+            const { payload, status } = await addTodo(value.todo)
             if (status !== 201) return
+            message.success('Item added')
             todos.unshift(payload)
         } else if (action === 'update' && selectedTodoID !== null) {
-            const { payload, status } = await updateTodo(selectedTodoID, todo)
+            const { payload, status } = await updateTodo(selectedTodoID, value.todo)
             if (status !== 200) return
             const index = todos.findIndex(todo => todo.id === payload.id)
             if (index === -1) return
+            message.success('Item updated')
             todos[index] = payload
         }
         this.setState({ todos, todo: '', action: 'add', error: '', selectedTodoID: null })
     }
 
-    handleEdit = index => () => {
-        const todo = this.state.todos[index]
-        this.setState({ todo: todo.task, selectedTodoID: todo.id, action: 'update' })
+    handleEdit = id => () => {
+        let todos = [...this.state.todos]
+        const index = todos.findIndex(todo => todo.id === id)
+        if (index === -1) return
+        const { task } = todos[index]
+        this.setState({ todo: task, selectedTodoID: id, action: 'update' })
     }
 
-    toggleCompleted = (index) => async () => {
+    toggleCompleted = async (id) => {
         let todos = [...this.state.todos]
-        const { task, is_completed, id } = todos[index]
-        const completed = is_completed ? false : true
-        const { payload, status } = await updateTodo(id, task, completed)
+        const index = todos.findIndex(todo => todo.id === id)
+        if (index === -1) return
+        const { is_completed, task } = todos[index]
+        const { payload, status } = await updateTodo(id, task, !is_completed)
         if (status !== 200) return
         todos[index] = payload
+        message.success('Todo status changed')
         this.setState({ todos: todos })
     }
 
-    deleteTodo = index => async () => {
-        const confirm = window.confirm('Are you sure you want to delete this item?')
-        if (!confirm) return
-
+    deleteTodo = async id => {
         let todos = [...this.state.todos]
-        const { id } = todos[index]
+        const index = todos.findIndex(todo => todo.id === id)
+        if (index === -1) return
         const { status } = await deleteTodo(id)
         if (status !== 204) return
         todos.splice(index, 1)
+        message.info('Item deleted')
         this.setState({ todos: todos })
     }
 
     render() {
-        const { todo, error, action, todos } = this.state
+        const { todo, action, todos } = this.state
         return (
-            <React.Fragment>
-                <Navbar />
-                <div className="container mt-3">
-                    <div className="row">
-                        <div className="col-md-8  offset-md-2 mb-3">
-                            <form>
-                                <div className="d-flex">
-                                    <input
-                                        placeholder="Add new task"
-                                        type='text' value={todo}
-                                        onChange={this.handleChange}
-                                        name='todo'
-                                        className="form-control mr-2" />
+            <Row justify="center" align="middle" gutter={[0, 20]} className="todos-container">
 
-                                    <button className="btn btn-outline-secondary" type="submit" onClick={this.handleSubmit}>{action === 'add' ? 'Add' : 'Update'}</button>
-                                </div>
-                                {
-                                    error && <span className="invalid-feedback">{error}</span>
-                                }
-                            </form>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-md-8  offset-md-2 mb-3">
-                            <TodoList
-                                todos={todos}
-                                toggleCompleted={this.toggleCompleted}
-                                handleEdit={this.handleEdit}
-                                deleteTodo={this.deleteTodo}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </React.Fragment>
-        );
+                <Col sm={{ span: 23 }} md={{ span: 21 }} lg={{ span: 20 }} xl={{ span: 18 }}>
+                    <Card title="Create a new todo">
+                        <TodoForm
+                            todo={todo}
+                            action={action}
+                            handleSubmit={this.handleSubmit}
+                        />
+                    </Card>
+                </Col>
+
+                <Col sm={{ span: 23 }} md={{ span: 21 }} lg={{ span: 20 }} xl={{ span: 18 }}>
+                    <Card title="Todo List">
+                        <TodoList
+                            todos={todos}
+                            toggleCompleted={this.toggleCompleted}
+                            handleEdit={this.handleEdit}
+                            deleteTodo={this.deleteTodo} />
+                    </Card>
+                </Col>
+            </Row>
+        )
     }
 }
 

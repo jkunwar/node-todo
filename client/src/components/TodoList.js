@@ -1,23 +1,46 @@
 import React from 'react'
+import { List, Tooltip, Switch, Popconfirm } from 'antd'
+import { CloseOutlined, CheckOutlined, DeleteOutlined } from '@ant-design/icons';
 
-const TodoList = ({ todos, toggleCompleted, handleEdit, deleteTodo }) => {
+export default function TodoList({ todos, toggleCompleted, handleEdit, deleteTodo }) {
     return (
-        <ul className="list-group list-group-flush">
-            {
-                todos.map((todo, index) => (
-                    <li className="list-group-item d-flex justify-content-between align-items-center" key={todo.id}>
-                        <div className="d-flex align-items-center">
-                            <input type='checkbox' name='is_completed' checked={todo.is_completed} onChange={toggleCompleted(index)} />
-                            <span className={`ml-2 ${todo.is_completed && 'line-through'} `} onClick={handleEdit(index)} style={{ cursor: 'pointer' }}>{todo.task}</span>
-                        </div>
-                        <div className="ml-2">
-                            <a href="#" onClick={deleteTodo(index)}>Delete</a>
-                        </div>
-                    </li>
-                ))
-            }
-        </ul>
-
+        <List
+            locale={{
+                emptyText: "There's nothing to do :("
+            }}
+            dataSource={todos}
+            renderItem={(todo, index) => (
+                <List.Item
+                    actions={[
+                        <Tooltip title={todo.is_completed ? 'Mark as uncompleted' : 'Mark as completed'}>
+                            <Switch
+                                checkedChildren={<CheckOutlined />}
+                                unCheckedChildren={<CloseOutlined />}
+                                onChange={() => toggleCompleted(todo.id)}
+                                defaultChecked={todo.is_completed}
+                            />
+                        </Tooltip>,
+                        <Popconfirm
+                            title="Are you sure you want to delete?"
+                            onConfirm={() => {
+                                deleteTodo(todo.id);
+                            }}
+                        >
+                            <DeleteOutlined className="remove-todo-button" />
+                        </Popconfirm>,
+                    ]}
+                    className="list-item"
+                    key={todo.id}
+                >
+                    <div className="todo-item">
+                        <p onClick={handleEdit(todo.id)} style={{ cursor: 'pointer' }}>{todo.task}</p>
+                    </div>
+                </List.Item>
+            )}
+            pagination={{
+                position: 'bottom',
+                pageSize: 10
+            }}
+        />
     )
 }
-export default TodoList
