@@ -8,9 +8,9 @@
     "start": "node server.js",
     "server": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "make:migration": "node commands.js make:migration",
+    "make:migration": "node commands/commands.js make:migration",
     "migrate": "node commands/commands.js migrate",
-    "db:fresh": "node commands.js db:fresh"
+    "db:fresh": "node commands/commands.js db:fresh"
   },
   "author": "Jagdish Kunwar",
   "license": "ISC",

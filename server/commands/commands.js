@@ -1,5 +1,5 @@
 const program = require('commander')
-const { create, migrate, fresh } = require('./migration')
+const { makemigration, migrate, fresh } = require('./migration')
 
 program.version('1.0.0')
 
@@ -11,7 +11,7 @@ program
             console.error('please provide table name')
             return
         }
-        create(tablename)
+        makemigration(tablename)
     })
 
 program

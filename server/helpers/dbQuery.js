@@ -1,15 +1,11 @@
-const pool = require('../db/pool')
-
 module.exports = {
-    query(queryString) {
+    query(queryString, pool) {
         pool.query(queryString)
             .then((res) => {
                 console.log(res);
-                // pool.end();
             })
             .catch((err) => {
                 console.log(err);
-                pool.end();
             });
     }
 }
