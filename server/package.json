@@ -9,7 +9,7 @@
     "server": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "make:migration": "node commands.js make:migration",
-    "migrate": "node commands.js migrate",
+    "migrate": "node commands/commands.js migrate",
     "db:fresh": "node commands.js db:fresh"
   },
   "author": "Jagdish Kunwar",

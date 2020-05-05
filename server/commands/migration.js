@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs')
-const dbQuery = require('./helpers/dbQuery')
+const dbQuery = require('../helpers/dbQuery')
 
 module.exports = {
 
@@ -29,7 +29,7 @@ module.exports = {
     },
 
     migrate() {
-        const directoryPath = path.join(__dirname, 'migrations');
+        const directoryPath = path.join(__dirname, '../migrations');
 
         fs.readdir(directoryPath, function (err, files) {
             if (err) return console.log('Unable to scan directory: ' + err);

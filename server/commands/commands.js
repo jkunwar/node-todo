@@ -9,7 +9,7 @@ program
     .action((tablename) => {
         if (!tablename || tablename === undefined) {
             console.error('please provide table name')
-            process.exit(0)
+            return
         }
         create(tablename)
     })
