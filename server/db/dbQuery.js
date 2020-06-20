@@ -1,10 +1,12 @@
-const pool = require('./pool')
+const pool = require('./pool');
 
 module.exports = {
     /**
      * DB Query
-     * @param {object} req
-     * @param {object} res
+     * 
+     * @param string quertText
+     * @param {object} params
+     * 
      * @returns {object} object
      */
     query(quertText, params) {

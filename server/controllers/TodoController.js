@@ -1,12 +1,12 @@
-const moment = require('moment')
-const { errorMessage, successMessage, status, } = require('../helpers/status')
-const Todo = require('../models/Todo')
+const moment = require('moment');
+const Todo = require('../models/Todo');
+const { errorMessage, successMessage, status, } = require('../helpers/status');
 
-const todo = new Todo()
+const todo = new Todo();
 
 const getTodos = async (req, res) => {
     try {
-        const { rows } = await todo.findAll()
+        const { rows } = await todo.findAll();
         if (rows[0] === undefined) {
             errorMessage.error = 'No todos found';
             return res.status(status.notfound).send(errorMessage);
@@ -20,8 +20,8 @@ const getTodos = async (req, res) => {
 }
 
 const addTodo = async (req, res) => {
-    const { task } = req.body
-    const created_on = moment(new Date())
+    const { task } = req.body;
+    const created_on = moment(new Date());
 
     if (task === undefined || task === '') {
         errorMessage.error = 'Task field required';
@@ -44,16 +44,16 @@ const addTodo = async (req, res) => {
 }
 
 const updateTodo = async (req, res) => {
-    let { task, is_completed } = req.body
-    const { id } = req.params
-    const updated_on = moment(new Date())
+    let { task, is_completed } = req.body;
+    const { id } = req.params;
+    const updated_on = moment(new Date());
 
     if (task === undefined || task === '') {
         errorMessage.error = 'Task field required';
         return res.status(status.bad).send(errorMessage);
     }
 
-    const completed = is_completed ? is_completed : false
+    const completed = is_completed ? is_completed : false;
 
     try {
         const { rows } = await todo.findById(id);
@@ -67,14 +67,14 @@ const updateTodo = async (req, res) => {
         successMessage.data = results;
         return res.status(status.success).send(successMessage);
     } catch (error) {
-        console.log(error)
+        console.log(error);
         errorMessage.error = 'Unable to update todo';
         return res.status(status.error).send(errorMessage);
     }
 }
 
 const deleteTodo = async (req, res) => {
-    const { id } = req.params
+    const { id } = req.params;
     try {
         const { rows } = await todo.delete({ id });
         if (!rows[0]) {
@@ -85,7 +85,7 @@ const deleteTodo = async (req, res) => {
         successMessage.data.message = 'Todo deleted successfully';
         return res.status(status.nocontent).send(successMessage);
     } catch (error) {
-        console.log(error)
+        console.log(error);
         errorMessage.error = 'Unable to delete todo';
         return res.status(status.error).send(errorMessage);
     }
@@ -96,4 +96,4 @@ module.exports = {
     addTodo,
     updateTodo,
     deleteTodo
-}
+};

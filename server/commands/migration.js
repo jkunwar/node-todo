@@ -1,13 +1,13 @@
+const fs = require('fs');
 const path = require('path');
-const fs = require('fs')
-const dbQuery = require('../helpers/dbQuery')
-const pool = require('../db/pool')
+const pool = require('../db/pool');
+const dbQuery = require('../helpers/dbQuery');
 
 module.exports = {
 
     makemigration(tablename) {
-        const time = new Date().getTime()
-        const filename = `migrations/${time}_create_${tablename}_table.js`
+        const time = new Date().getTime();
+        const filename = `migrations/${time}_create_${tablename}_table.js`;
 
         const content = `module.exports = {
             create() {
@@ -21,12 +21,12 @@ module.exports = {
             drop() {
                 return queryString = \`DROP TABLE IF EXISTS ${tablename}\`;
             }
-        }`
+        }`;
 
         fs.writeFile(filename, content, (err) => {
-            if (err) return console.log(err)
-            console.log(`${tablename} migration created`)
-        })
+            if (err) return console.log(err);
+            console.log(`${tablename} migration created`);
+        });
     },
 
     migrate() {
@@ -36,11 +36,11 @@ module.exports = {
             if (err) return console.log('Unable to scan directory: ' + err);
 
             files.forEach(async file => {
-                const filename = path.join(directoryPath, file)
-                const { create } = require(filename)
-                await dbQuery.query(create(), pool)
+                const filename = path.join(directoryPath, file);
+                const { create } = require(filename);
+                await dbQuery.query(create());
             });
-            pool.end()
+            pool.end();
         });
 
     },
@@ -52,11 +52,11 @@ module.exports = {
             if (err) return console.log('Unable to scan directory: ' + err);
 
             files.forEach(async file => {
-                const filename = path.join(directoryPath, file)
-                const { drop } = require(filename)
-                await dbQuery.query(drop(), pool)
+                const filename = path.join(directoryPath, file);
+                const { drop } = require(filename);
+                await dbQuery.query(drop());
             });
-            pool.end()
+            pool.end();
         });
 
     }

@@ -1,7 +1,7 @@
-const program = require('commander')
-const { makemigration, migrate, fresh } = require('./migration')
+const program = require('commander');
+const { makemigration, migrate, fresh } = require('./migration');
 
-program.version('1.0.0')
+program.version('1.0.0');
 
 program
     .command('make:migration <tablename>')
@@ -12,16 +12,16 @@ program
             return
         }
         makemigration(tablename)
-    })
+    });
 
 program
     .command('migrate')
     .description('migrate tables')
-    .action(() => migrate())
+    .action(() => migrate());
 
 program
     .command('db:fresh')
     .description('drop database')
-    .action(() => fresh())
+    .action(() => fresh());
 
-program.parse(process.argv)
+program.parse(process.argv);

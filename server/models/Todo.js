@@ -1,7 +1,7 @@
-const Model = require('./Model')
+const Model = require('./Model');
 
 class Todo extends Model {
-    TABLE_NAME = 'todos'
+    TABLE_NAME = 'todos';
 }
 
-module.exports = Todo
+module.exports = Todo;
